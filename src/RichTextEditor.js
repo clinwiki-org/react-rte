@@ -28,6 +28,7 @@ import type {ImportOptions} from './lib/EditorValue';
 import ButtonGroup from './ui/ButtonGroup';
 import Button from './ui/Button';
 import Dropdown from './ui/Dropdown';
+import PopoverIconButton from './ui/PopoverIconButton';
 
 const MAX_LIST_DEPTH = 2;
 
@@ -368,6 +369,7 @@ Object.assign(RichTextEditor, {
   ButtonGroup,
   Button,
   Dropdown,
+  PopoverIconButton,
 });
 
 export {
@@ -378,4 +380,5 @@ export {
   ButtonGroup,
   Button,
   Dropdown,
+  PopoverIconButton,
 };
