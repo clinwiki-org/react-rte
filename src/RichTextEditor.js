@@ -332,7 +332,9 @@ export default class RichTextEditor extends Component {
   }
 
   _focus() {
-    this.editor.focus();
+    if (this.editor) {
+      this.editor.focus();
+    }
   }
 }
 
