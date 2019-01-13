@@ -22,6 +22,10 @@ type Props = {
 type State = {
   width: number;
   height: number;
+
+  isYoutube: boolean;
+  ytId?: string;
+  ytThumb?: string;
 };
 
 export default class ImageSpan extends Component {
@@ -36,19 +40,25 @@ export default class ImageSpan extends Component {
     this.state = {
       width,
       height,
+      isYoutube: false
     };
   }
 
   componentDidMount() {
     const {width, height} = this.state;
     const entity = this.props.contentState.getEntity(this.props.entityKey);
+    let {src} = entity.getData();
+    const vidProps = this.videoProps(src)
+    if (vidProps) {
+      src = `https://img.youtube.com/vi/${vidProps.id}/0.jpg`;
+    }
     const image = new Image();
-    const {src} = entity.getData();
     image.src = src;
     image.onload = () => {
-      if (width == null || height == null) {
-        // TODO: isMounted?
-        this.setState({width: image.width, height: image.height});
+      if (width == null || height == null || vidProps) {
+        this.setState(vidProps ? 
+          {width: image.width, height: image.height, isYoutube: true, ytId: vidProps.id, ytThumbnail:src}:
+          {width: image.width, height: image.height});
         Entity.mergeData(
           this.props.entityKey,
           {
@@ -62,16 +72,35 @@ export default class ImageSpan extends Component {
     };
   }
 
+  videoProps(src) {
+    try {
+      const url = /https?:\/\//ig.test(src) ? new URL(src) : new URL('http://'+src);
+      if (/(www\.)?youtu\.be/ig.test(url.hostname)) {
+        return { id: url.pathname.substr(1) };
+      }
+      else if (/(www\.)?youtube\.com/ig.test(url.hostname)) {
+        return { id: url.searchParams.get('v') };
+      }
+    }
+    catch(_) {}
+    return null;
+  }
+
   render() {
-    const {width, height} = this.state;
+    const {width, height, isYoutube, ytThumbnail} = this.state;
     let {className} = this.props;
     const entity = this.props.contentState.getEntity(this.props.entityKey);
     const {src} = entity.getData();
 
-    className = cx(className, styles.root);
+    className = isYoutube ?  
+      cx(className, styles['video-thumbnail'], styles.root) :
+      cx(className, styles.root); 
+    console.log(styles);
+    console.log(className);
+    const imgSrc = isYoutube ? ytThumbnail : src;
     const imageStyle = {
       verticalAlign: 'bottom',
-      backgroundImage: `url("${src}")`,
+      backgroundImage: `url("${imgSrc}")`,
       backgroundSize: `${width}px ${height}px`,
       lineHeight: `${height}px`,
       fontSize: `${height}px`,
@@ -92,7 +121,14 @@ export default class ImageSpan extends Component {
   }
 
   _onClick() {
-    console.log('image clicked');
+    if (this.state.isYoutube) {
+      const entity = this.props.contentState.getEntity(this.props.entityKey);
+      const {src} = entity.getData();
+      window.open(src,"_blank")
+    }
+    else {
+      console.log('image clicked');
+    }
   }
 
   _handleResize(event: Object, data: Object) {
