@@ -1,7 +1,7 @@
 {
-  "name": "react-rte",
+  "name": "react-rte-yt",
   "version": "0.16.1",
-  "description": "React Rich Text Editor",
+  "description": "React Rich Text Editor With Youtube support",
   "main": "dist/react-rte.js",
   "files": [
     "lib",
@@ -13,7 +13,7 @@
     "build-lib": "rimraf lib && babel src --ignore \"_*\" --out-dir lib --copy-files",
     "lint": "eslint --max-warnings 0 .",
     "typecheck": "flow",
-    "prepublish": "npm run build",
+    "manual_prepublish": "npm run build",
     "start": "webpack-dev-server --content-base assets/",
     "test": "npm run lint && npm run typecheck && npm run test-src",
     "test-src": "BABEL_ENV=test mocha \"src/**/__tests__/*.js\""
@@ -28,7 +28,9 @@
     "draft-js-import-html": ">=0.4.0",
     "draft-js-import-markdown": ">=0.3.0",
     "draft-js-utils": ">=0.2.0",
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "react": "0.14.x || 15.x.x || 16.x.x",
+    "react-dom": "0.14.x || 15.x.x || 16.x.x"
   },
   "peerDependencies": {
     "react": "0.14.x || 15.x.x || 16.x.x",
@@ -133,6 +135,10 @@
     {
       "name": "Hyunyoung Cho",
       "url": "https://github.com/ZeroCho"
+    },
+    {
+      "name": "Eric Harding",
+      "url": "https://github.com/ericharding/"
     }
   ],
   "license": "ISC",
