@@ -1,6 +1,6 @@
 {
   "name": "react-rte-yt",
-  "version": "0.16.1",
+  "version": "0.16.2-0",
   "description": "React Rich Text Editor With Youtube support",
   "main": "dist/react-rte.js",
   "files": [
@@ -62,7 +62,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sstur/react-rte.git"
+    "url": "git+https://github.com/clinwiki-org/react-rte"
   },
   "keywords": [
     "reactjs",
@@ -72,7 +72,7 @@
     "richtext",
     "editor"
   ],
-  "author": "sstur@me.com",
+  "author": "eric@digitalsorcery.net",
   "contributors": [
     {
       "name": "Adam J. McIntyre",
@@ -141,7 +141,7 @@
   ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sstur/react-rte/issues"
+    "url": "https://github.com/clinwiki-org/react-rte/issues"
   },
-  "homepage": "https://github.com/sstur/react-rte#readme"
+  "homepage": "https://github.com/clinwiki-org/react-rte#readme"
 }

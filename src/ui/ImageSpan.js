@@ -95,8 +95,6 @@ export default class ImageSpan extends Component {
     className = isYoutube ?  
       cx(className, styles['video-thumbnail'], styles.root) :
       cx(className, styles.root); 
-    console.log(styles);
-    console.log(className);
     const imgSrc = isYoutube ? ytThumbnail : src;
     const imageStyle = {
       verticalAlign: 'bottom',
