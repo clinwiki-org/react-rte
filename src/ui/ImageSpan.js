@@ -45,7 +45,7 @@ export default class ImageSpan extends Component {
   }
 
   componentDidMount() {
-    let {width, height} = this.state;
+    const {width, height} = this.state;
     const entity = this.props.contentState.getEntity(this.props.entityKey);
     let {src} = entity.getData();
     const vidProps = this.videoProps(src)
@@ -56,20 +56,21 @@ export default class ImageSpan extends Component {
     image.src = src;
     image.onload = () => {
       if (width == null || height == null || vidProps) {
+        let setWidth = image.width, setHeight= image.height;
         if (vidProps) {
-          width /= 3;
-          height /= 3;
+          setWidth /= 3;
+          setHeight /= 3;
         }
         this.setState(vidProps ? 
-          {width: image.width, height: image.height, isYoutube: true, ytId: vidProps.id, ytThumbnail:src}:
-          {width: image.width, height: image.height});
+          {width: setWidth, height: setHeight, isYoutube: true, ytId: vidProps.id, ytThumbnail:src}:
+          {width: setWidth, height: setHeight});
         Entity.mergeData(
           this.props.entityKey,
           {
-            width: image.width,
-            height: image.height,
-            originalWidth: image.width,
-            originalHeight: image.height,
+            width: setWidth,
+            height: setHeight,
+            originalWidth: setWidth,
+            originalHeight: setHeight,
           }
         );
       }
