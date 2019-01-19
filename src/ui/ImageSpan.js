@@ -45,7 +45,7 @@ export default class ImageSpan extends Component {
   }
 
   componentDidMount() {
-    const {width, height} = this.state;
+    let {width, height} = this.state;
     const entity = this.props.contentState.getEntity(this.props.entityKey);
     let {src} = entity.getData();
     const vidProps = this.videoProps(src)
@@ -56,6 +56,10 @@ export default class ImageSpan extends Component {
     image.src = src;
     image.onload = () => {
       if (width == null || height == null || vidProps) {
+        if (vidProps) {
+          width /= 3;
+          height /= 3;
+        }
         this.setState(vidProps ? 
           {width: image.width, height: image.height, isYoutube: true, ytId: vidProps.id, ytThumbnail:src}:
           {width: image.width, height: image.height});

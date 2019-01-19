@@ -1,6 +1,6 @@
 {
   "name": "react-rte-yt",
-  "version": "0.16.1",
+  "version": "0.16.2-1",
   "description": "React Rich Text Editor With Youtube support",
   "main": "dist/react-rte.js",
   "files": [
@@ -54,7 +54,9 @@
     "flow-bin": "^0.32.0",
     "mocha": "^3.1.2",
     "raw-loader": "^0.5.1",
+    "react": "^16.7.0",
     "react-addons-test-utils": "^15.0.2",
+    "react-dom": "^16.7.0",
     "rimraf": "^2.5.4",
     "style-loader": "^0.18.2",
     "webpack": "^3.4.0",
