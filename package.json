@@ -1,6 +1,6 @@
 {
   "name": "react-rte-yt",
-  "version": "0.16.2-2",
+  "version": "0.16.2-3",
   "description": "React Rich Text Editor With Youtube support",
   "main": "dist/react-rte.js",
   "files": [
