@@ -12,11 +12,22 @@ type Props = {
 
 type EntityRangeCallback = (start: number, end: number) => void;
 
+function isSameSite(dest) {
+  try {
+    var uDest = new URL(dest);
+    var uHere = window.location;
+    return uDest.host === uHere.host;
+  } catch(_) {return false}
+}
+
 function Link(props: Props) {
   const {url} = props.contentState.getEntity(props.entityKey).getData();
-  return (
-    <a href={url}>{props.children}</a>
-  );
+  if (isSameSite(url)) {
+    return <a href={url}>{props.children}</a>;
+  }
+  else {
+    return <a href={url} target="_blank">{props.children}</a>;
+  }
 }
 
 function findLinkEntities(contentBlock: ContentBlock, callback: EntityRangeCallback, contentState: ?ContentState) {

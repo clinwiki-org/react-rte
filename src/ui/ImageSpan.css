@@ -33,7 +33,7 @@
 }
 .video-thumbnail:before {
   position: absolute;
-  transform: translate(65px,0%);
+  transform: translate(60px,0%);
   content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj4NCjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTQyNC40IDIxNC43TDcyLjQgNi42QzQzLjgtMTAuMyAwIDYuMSAwIDQ3LjlWNDY0YzAgMzcuNSA0MC43IDYwLjEgNzIuNCA0MS4zbDM1Mi0yMDhjMzEuNC0xOC41IDMxLjUtNjQuMSAwLTgyLjZ6IiBjbGFzcz0iIj48L3BhdGg+PC9zdmc+DQo=);
   opacity: 0.8;
   width: 40px;
