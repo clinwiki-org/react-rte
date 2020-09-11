@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import {CompositeDecorator, Editor, EditorState, Modifier, RichUtils, Entity} from 'draft-js';
 import getDefaultKeyBinding from 'draft-js/lib/getDefaultKeyBinding';
+import {getTextAlignBlockMetadata, getTextAlignClassName, getTextAlignStyles} from './lib/blockStyleFunctions';
 import changeBlockDepth from './lib/changeBlockDepth';
 import changeBlockType from './lib/changeBlockType';
 import getBlocksInSelection from './lib/getBlocksInSelection';
@@ -55,14 +56,17 @@ type Props = {
   handleReturn?: (event: Object) => boolean;
   customControls?: Array<CustomControl>;
   readOnly?: boolean;
+  toolbarHidden?: boolean;
   disabled?: boolean; // Alias of readOnly
   toolbarConfig?: ToolbarConfig;
+  toolbarOnBottom?: boolean;
   blockStyleFn?: (block: ContentBlock) => ?string;
   autoFocus?: boolean;
   keyBindingFn?: (event: Object) => ?string;
   rootStyle?: Object;
   editorStyle?: Object;
   toolbarStyle?: Object;
+  onBlur?: (event: Object) => void;
 };
 
 export default class RichTextEditor extends Component {
@@ -95,8 +99,10 @@ export default class RichTextEditor extends Component {
       placeholder,
       customStyleMap,
       readOnly,
+      toolbarHidden,
       disabled,
       toolbarConfig,
+      toolbarOnBottom,
       blockStyleFn,
       customControls,
       keyBindingFn,
@@ -118,10 +124,12 @@ export default class RichTextEditor extends Component {
       readOnly = disabled;
     }
     let editorToolbar;
-    if (!readOnly) {
+
+    if (!readOnly && !toolbarHidden) {
       editorToolbar = (
         <EditorToolbar
           rootStyle={toolbarStyle}
+          isOnBottom={toolbarOnBottom}
           className={toolbarClassName}
           keyEmitter={this._keyEmitter}
           editorState={editorState}
@@ -134,7 +142,7 @@ export default class RichTextEditor extends Component {
     }
     return (
       <div className={cx(styles.root, className)} style={rootStyle}>
-        {editorToolbar}
+        { !toolbarOnBottom && editorToolbar }
         <div className={combinedEditorClassName} style={editorStyle}>
           <Editor
             {...otherProps}
@@ -154,6 +162,7 @@ export default class RichTextEditor extends Component {
             readOnly={readOnly}
           />
         </div>
+        { toolbarOnBottom && editorToolbar }
       </div>
     );
   }
@@ -379,6 +388,9 @@ export {
   decorator,
   createEmptyValue,
   createValueFromString,
+  getTextAlignBlockMetadata,
+  getTextAlignClassName,
+  getTextAlignStyles,
   ButtonGroup,
   Button,
   Dropdown,

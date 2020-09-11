@@ -32,6 +32,7 @@ type Props = {
   toolbarConfig: ToolbarConfig;
   customControls: Array<CustomControl>;
   rootStyle?: Object;
+  isOnBottom?: boolean;
 };
 
 type State = {
@@ -55,7 +56,8 @@ export default class EditorToolbar extends Component {
     };
   }
 
-  componentWillMount() {
+  // eslint-disable-next-line
+  UNSAFE_componentWillMount() {
     // Technically, we should also attach/detach event listeners when the
     // `keyEmitter` prop changes.
     this.props.keyEmitter.on('keypress', this._onKeypress);
@@ -66,7 +68,7 @@ export default class EditorToolbar extends Component {
   }
 
   render() {
-    let {className, toolbarConfig, rootStyle} = this.props;
+    let {className, toolbarConfig, rootStyle, isOnBottom} = this.props;
     if (toolbarConfig == null) {
       toolbarConfig = DefaultToolbarConfig;
     }
@@ -75,6 +77,9 @@ export default class EditorToolbar extends Component {
       switch (groupName) {
         case 'INLINE_STYLE_BUTTONS': {
           return this._renderInlineStyleButtons(groupName, toolbarConfig);
+        }
+        case 'BLOCK_ALIGNMENT_BUTTONS': {
+          return this._renderBlockAlignmentButtons(groupName, toolbarConfig);
         }
         case 'BLOCK_TYPE_DROPDOWN': {
           return this._renderBlockTypeDropdown(groupName, toolbarConfig);
@@ -94,7 +99,7 @@ export default class EditorToolbar extends Component {
       }
     });
     return (
-      <div className={cx(styles.root, className)} style={rootStyle}>
+      <div className={cx(styles.root, (isOnBottom && styles.onBottom), className)} style={rootStyle}>
         {buttonGroups}
         {this._renderCustomControls()}
       </div>
@@ -189,6 +194,30 @@ export default class EditorToolbar extends Component {
     );
   }
 
+  _renderBlockAlignmentButtons(name: string, toolbarConfig: ToolbarConfig) {
+    let {editorState} = this.props;
+    let content = editorState.getCurrentContent();
+    let selection = editorState.getSelection();
+    let blockKey = selection.getStartKey();
+    let block = content.getBlockForKey(blockKey);
+    let blockAlignment = block.getData().get('textAlign');
+
+    let buttons = (toolbarConfig.BLOCK_ALIGNMENT_BUTTONS || []).map((type, index) => (
+      <StyleButton
+        {...toolbarConfig.extraProps}
+        key={String(index)}
+        isActive={blockAlignment === type.style}
+        label={type.label}
+        onToggle={this._toggleAlignment}
+        style={type.style}
+        className={type.className}
+      />
+    ));
+    return (
+      <ButtonGroup key={name}>{buttons}</ButtonGroup>
+    );
+  }
+
   _renderLinkButtons(name: string, toolbarConfig: ToolbarConfig) {
     let {editorState} = this.props;
     let selection = editorState.getSelection();
@@ -197,21 +226,32 @@ export default class EditorToolbar extends Component {
     let isCursorOnLink = (entity != null && entity.type === ENTITY_TYPE.LINK);
     let shouldShowLinkButton = hasSelection || isCursorOnLink;
     let defaultValue = (entity && isCursorOnLink) ? entity.getData().url : '';
+    let config = toolbarConfig.LINK_BUTTONS || {};
+    let linkConfig = config.link || {};
+    let removeLinkConfig = config.removeLink || {};
+    let linkLabel = linkConfig.label || 'Link';
+    let removeLinkLabel = removeLinkConfig.label || 'Remove Link';
+    let targetBlank = (entity && isCursorOnLink) ? entity.getData().target === '_blank' : false;
+    let noFollow = (entity && isCursorOnLink) ? entity.getData().rel === 'nofollow' : false;
 
     return (
       <ButtonGroup key={name}>
         <PopoverIconButton
-          label="Link"
+          label={linkLabel}
           iconName="link"
           isDisabled={!shouldShowLinkButton}
           showPopover={this.state.showLinkInput}
           onTogglePopover={this._toggleShowLinkInput}
           defaultValue={defaultValue}
           onSubmit={this._setLink}
+          checkOptions={{
+            targetBlank: {label: 'Open link in new tab', defaultValue: targetBlank},
+            noFollow: {label: 'No follow', defaultValue: noFollow},
+          }}
         />
         <IconButton
           {...toolbarConfig.extraProps}
-          label="Remove Link"
+          label={removeLinkLabel}
           iconName="remove-link"
           isDisabled={!isCursorOnLink}
           onClick={this._removeLink}
@@ -221,11 +261,13 @@ export default class EditorToolbar extends Component {
     );
   }
 
-  _renderImageButton(name: string) {
+  _renderImageButton(name: string, toolbarConfig: ToolbarConfig) {
+    const config = (toolbarConfig.IMAGE_BUTTON || {});
+    const label = config.label || 'Image';
     return (
       <ButtonGroup key={name}>
         <PopoverIconButton
-          label="Image"
+          label={label}
           iconName="image"
           showPopover={this.state.showImageInput}
           onTogglePopover={this._toggleShowImageInput}
@@ -239,11 +281,16 @@ export default class EditorToolbar extends Component {
     let {editorState} = this.props;
     let canUndo = editorState.getUndoStack().size !== 0;
     let canRedo = editorState.getRedoStack().size !== 0;
+    const config = toolbarConfig.HISTORY_BUTTONS || {};
+    const undoConfig = config.undo || {};
+    const redoConfig = config.redo || {};
+    const undoLabel = undoConfig.label || 'Undo';
+    const redoLabel = redoConfig.label || 'Redo';
     return (
       <ButtonGroup key={name}>
         <IconButton
           {...toolbarConfig.extraProps}
-          label="Undo"
+          label={undoLabel}
           iconName="undo"
           isDisabled={!canUndo}
           onClick={this._undo}
@@ -251,7 +298,7 @@ export default class EditorToolbar extends Component {
         />
         <IconButton
           {...toolbarConfig.extraProps}
-          label="Redo"
+          label={redoLabel}
           iconName="redo"
           isDisabled={!canRedo}
           onClick={this._redo}
@@ -328,7 +375,7 @@ export default class EditorToolbar extends Component {
     this._focusEditor();
   }
 
-  _setLink(url: string) {
+  _setLink(url: string, checkOptions: {[key: string]: boolean}) {
     let {editorState} = this.props;
     let contentState = editorState.getCurrentContent();
     let selection = editorState.getSelection();
@@ -351,7 +398,9 @@ export default class EditorToolbar extends Component {
 
     this.setState({showLinkInput: false});
     if (canApplyLink) {
-      contentState = contentState.createEntity(ENTITY_TYPE.LINK, 'MUTABLE', {url});
+      let target = checkOptions.targetBlank ? '_blank' : undefined;
+      let rel = checkOptions.noFollow ? 'nofollow' : undefined;
+      contentState = contentState.createEntity(ENTITY_TYPE.LINK, 'MUTABLE', {url, target, rel});
       let entityKey = contentState.getLastCreatedEntityKey();
 
       editorState = EditorState.push(editorState, contentState);
@@ -416,6 +465,35 @@ export default class EditorToolbar extends Component {
         inlineStyle
       )
     );
+  }
+
+  _toggleAlignment(textAlign: string) {
+    let {editorState} = this.props;
+    let selection = editorState.getSelection();
+
+    let content = editorState.getCurrentContent();
+    let blockKey = selection.getStartKey();
+    let block = content.getBlockForKey(blockKey);
+    let blockData = block.getData();
+
+    let newBlockData;
+    if (blockData.get('textAlign') === textAlign) {
+      newBlockData = blockData.remove('textAlign');
+    } else {
+      newBlockData = blockData.set('textAlign', textAlign);
+    }
+
+    let newBlock = block.set('data', newBlockData);
+
+    let newContent = content.merge({
+      blockMap: content.getBlockMap().set(blockKey, newBlock),
+    });
+    let newState = EditorState.push(
+      editorState,
+      newContent,
+      'change-block-data'
+    );
+    this.props.onChange(newState);
   }
 
   _undo() {
