@@ -1,7 +1,7 @@
 {
-  "name": "react-rte-yt",
-  "version": "0.16.2-3",
-  "description": "React Rich Text Editor With Youtube support",
+  "name": "react-rte",
+  "version": "0.16.3",
+  "description": "React Rich Text Editor",
   "main": "dist/react-rte.js",
   "files": [
     "lib",
@@ -13,7 +13,7 @@
     "build-lib": "rimraf lib && babel src --ignore \"_*\" --out-dir lib --copy-files",
     "lint": "eslint --max-warnings 0 .",
     "typecheck": "flow",
-    "manual_prepublish": "npm run build",
+    "prepare": "npm run build",
     "start": "webpack-dev-server --content-base assets/",
     "test": "npm run lint && npm run typecheck && npm run test-src",
     "test-src": "BABEL_ENV=test mocha \"src/**/__tests__/*.js\""
@@ -54,9 +54,9 @@
     "flow-bin": "^0.32.0",
     "mocha": "^3.1.2",
     "raw-loader": "^0.5.1",
-    "react": "^16.7.0",
-    "react-addons-test-utils": "^15.0.2",
-    "react-dom": "^16.7.0",
+    "react": "16.x.x",
+    "react-dom": "16.x.x",
+    "react-test-renderer": "^16.4.0",
     "rimraf": "^2.5.4",
     "style-loader": "^0.18.2",
     "webpack": "^3.4.0",
